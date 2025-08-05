@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from supabase import create_client, Client
+from supabase import create_client
 from flask_cors import CORS
 import os
 
@@ -10,22 +10,13 @@ CORS(app)
 SUPABASE_URL = "https://fhhpwfujypcpklpwvvhf.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZoaHB3ZnVqeXBjcGtscHd2dmhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNDE1NDgsImV4cCI6MjA2OTkxNzU0OH0.z2j491yR9HunwNAGa_NngPiXAG18Cf1ZpaUAvdE5eF4"
 
-# Initialize Supabase client with stable configuration
+# Initialize Supabase client with simple configuration
 try:
-    supabase: Client = create_client(
-        SUPABASE_URL,
-        SUPABASE_KEY,
-        {
-            'auto_refresh_token': False,
-            'persist_session': False,
-            'headers': {
-                'Content-Type': 'application/json',
-                'apikey': SUPABASE_KEY
-            }
-        }
-    )
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     # Test connection with a simple query
-    supabase.table('crops').select('*').limit(1).execute()
+    response = supabase.table('crops').select('*').limit(1).execute()
+    if 'error' in response:
+        raise Exception(response['error'])
     print("✅ Supabase connection successful!")
 except Exception as e:
     print(f"❌ Supabase connection failed: {str(e)}")
@@ -58,7 +49,9 @@ def get_crops():
             query = query.eq('region', region)
         
         response = query.execute()
-        return jsonify(response.data)
+        if 'error' in response:
+            return jsonify({"error": response['error']}), 500
+        return jsonify(response['data'])
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
