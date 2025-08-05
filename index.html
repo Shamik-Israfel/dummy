@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KrishiGhor - Bangladesh Crop Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <header class="bg-green-700 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-leaf text-2xl text-yellow-300"></i>
+                <h1 class="text-2xl font-bold">KrishiGhor</h1>
+                <span class="bg-yellow-500 text-green-800 px-2 py-1 rounded-full text-xs">বাংলাদেশ</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="p-2 rounded-full bg-green-800 hover:bg-green-900">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div id="cart-btn" class="relative cursor-pointer">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-yellow-400 text-green-900 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="bg-gradient-to-r from-green-600 to-green-800 text-white py-12">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">Bangladesh's Digital Crop Marketplace</h2>
+            <p class="max-w-2xl mx-auto">Connecting farmers directly with buyers across Dhaka, Chittagong, Khulna, and all regions</p>
+            <div class="mt-6 relative max-w-md mx-auto">
+                <input type="text" id="main-search" placeholder="Search crops (rice, jute, vegetables...)" 
+                       class="w-full px-4 py-3 rounded-full text-gray-800 focus:outline-none">
+                <button class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 text-green-800 px-4 py-1 rounded-full">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-4 py-8" id="ai-section">
+        <h3 class="text-xl font-bold mb-4 flex items-center">
+            <i class="fas fa-robot text-green-600 mr-2"></i> AI Crop Suggestions
+        </h3>
+        <div id="ai-recommendations" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Filled by JavaScript -->
+        </div>
+    </section>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0">Available Crops</h2>
+            <div class="flex space-x-2">
+                <select id="region-filter" class="px-3 py-2 border rounded-lg bg-white">
+                    <option value="">All Regions</option>
+                    <option>Dhaka</option>
+                    <option>Chittagong</option>
+                    <option>Khulna</option>
+                    <option>Rajshahi</option>
+                </select>
+                <select id="type-filter" class="px-3 py-2 border rounded-lg bg-white">
+                    <option value="">All Types</option>
+                    <option>Rice</option>
+                    <option>Jute</option>
+                    <option>Vegetables</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="crops-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        </div>
+    </main>
+
+    <!-- Shopping Cart Sidebar -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full md:w-96 bg-white shadow-lg transform translate-x-full transition-transform z-50">
+        <div class="p-4 border-b flex justify-between items-center">
+            <h3 class="font-bold text-lg">Your Order</h3>
+            <button id="close-cart" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="cart-items" class="p-4 overflow-y-auto h-3/4">
+            <!-- Cart items appear here -->
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t bg-gray-50">
+            <div class="flex justify-between font-bold mb-4">
+                <span>Total:</span>
+                <span id="cart-total">৳0</span>
+            </div>
+            <button id="checkout-btn" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg">
+                Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
