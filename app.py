@@ -1,17 +1,26 @@
 from flask import Flask, jsonify, request
-from supabase import create_client
+from supabase import create_client, Client
 from flask_cors import CORS
+import os
 
 app = Flask(__name__)
 CORS(app)
 
-# Direct Supabase connection (using your credentials)
+# Supabase configuration - using your credentials
 SUPABASE_URL = "https://fhhpwfujypcpklpwvvhf.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZoaHB3ZnVqeXBjcGtscHd2dmhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNDE1NDgsImV4cCI6MjA2OTkxNzU0OH0.z2j491yR9HunwNAGa_NngPiXAG18Cf1ZpaUAvdE5eF4"
 
+# Initialize Supabase client with correct configuration
 try:
-    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-    print("✅ Supabase connected successfully!")
+    supabase: Client = create_client(
+        SUPABASE_URL,
+        SUPABASE_KEY,
+        options={
+            'auto_refresh_token': False,
+            'persist_session': False
+        }
+    )
+    print("✅ Successfully connected to Supabase!")
 except Exception as e:
     print(f"❌ Supabase connection failed: {str(e)}")
     supabase = None
