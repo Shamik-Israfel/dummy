@@ -2,30 +2,34 @@ from flask import Flask, jsonify, request
 from supabase import create_client
 import os
 from ai_recommendations import get_ai_recommendations
-from dotenv import load_dotenv
 from flask_cors import CORS
 
-# Load environment variables
-load_dotenv()
-
-# Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
-# Configure Supabase - CORRECTED VERSION
-supabase_url = "https://fhhpwfujypcpklpwvvhf.supabase.co"
-supabase_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZoaHB3ZnVqeXBjcGtscHd2dmhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNDE1NDgsImV4cCI6MjA2OTkxNzU0OH0.z2j491yR9HunwNAGa_NngPiXAG18Cf1ZpaUAvdE5eF4"
+# DIRECT SUPABASE CONNECTION (using your credentials)
+SUPABASE_URL = "https://fhhpwfujypcpklpwvvhf.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZoaHB3ZnVqeXBjcGtscHd2dmhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNDE1NDgsImV4cCI6MjA2OTkxNzU0OH0.z2j491yR9HunwNAGa_NngPiXAG18Cf1ZpaUAvdE5eF4"
 
-# Initialize Supabase client
 try:
-    supabase = create_client(supabase_url, supabase_key)
-    print("Successfully connected to Supabase!")  # This will appear in your logs
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    print("✅ Successfully connected to Supabase!")
 except Exception as e:
-    print(f"Failed to connect to Supabase: {str(e)}")
-    raise  # This will stop the app if Supabase connection fails
+    print(f"❌ Supabase connection failed: {str(e)}")
+    supabase = None  # This will make API calls fail gracefully
+
+@app.route('/')
+def health_check():
+    return jsonify({
+        "status": "running",
+        "supabase_connected": supabase is not None
+    })
 
 @app.route('/api/crops', methods=['GET'])
 def get_crops():
+    if not supabase:
+        return jsonify({"error": "Supabase not connected"}), 500
+        
     try:
         search = request.args.get('search', '')
         crop_type = request.args.get('type', '')
@@ -40,32 +44,24 @@ def get_crops():
         if region:
             query = query.eq('region', region)
         
-        crops = query.execute()
-        return jsonify({
-            'success': True,
-            'data': crops.data
-        })
+        response = query.execute()
+        return jsonify(response.data)
+        
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/recommendations', methods=['POST'])
 def recommendations():
+    if not supabase:
+        return jsonify({"error": "Supabase not connected"}), 500
+        
     try:
         cart_items = request.json.get('cart', [])
         recommendations = get_ai_recommendations(cart_items, supabase)
-        return jsonify({
-            'success': True,
-            'recommendations': recommendations
-        })
+        return jsonify(recommendations)
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port)
