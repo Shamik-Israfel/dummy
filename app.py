@@ -10,16 +10,22 @@ CORS(app)
 SUPABASE_URL = "https://fhhpwfujypcpklpwvvhf.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZoaHB3ZnVqeXBjcGtscHd2dmhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNDE1NDgsImV4cCI6MjA2OTkxNzU0OH0.z2j491yR9HunwNAGa_NngPiXAG18Cf1ZpaUAvdE5eF4"
 
-# Initialize Supabase client with correct configuration
+# Initialize Supabase client with proper configuration
 try:
     supabase: Client = create_client(
         SUPABASE_URL,
         SUPABASE_KEY,
-        options={
+        {
             'auto_refresh_token': False,
-            'persist_session': False
+            'persist_session': False,
+            'headers': {
+                'Content-Type': 'application/json',
+                'apikey': SUPABASE_KEY
+            }
         }
     )
+    # Test connection
+    supabase.table('crops').select('*').limit(1).execute()
     print("✅ Successfully connected to Supabase!")
 except Exception as e:
     print(f"❌ Supabase connection failed: {str(e)}")
