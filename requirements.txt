@@ -7,4 +7,5 @@ pandas==1.3.5
 numpy==1.21.6
 joblib==1.1.0
 Flask==2.0.3
-Werkzeug==2.0.3  # Critical fix - must match Flask version
+Werkzeug==2.0.3
+httpx==0.24.1  # Critical fix for Supabase compatibility
