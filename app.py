@@ -6,52 +6,53 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# Supabase configuration - using your credentials
+# Supabase configuration
 SUPABASE_URL = "https://fhhpwfujypcpklpwvvhf.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZoaHB3ZnVqeXBjcGtscHd2dmhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNDE1NDgsImV4cCI6MjA2OTkxNzU0OH0.z2j491yR9HunwNAGa_NngPiXAG18Cf1ZpaUAvdE5eF4"
 
-# Initialize Supabase client with simple configuration
+# Initialize Supabase client
 try:
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-    # Test connection with a simple query
-    response = supabase.table('crops').select('*').limit(1).execute()
-    if 'error' in response:
-        raise Exception(response['error'])
-    print("✅ Supabase connection successful!")
+    # Test connection with minimal query
+    test = supabase.table('crops').select('id').limit(1).execute()
+    if hasattr(test, 'error') and test.error:
+        raise Exception(test.error.message)
+    print("🔥 Supabase connected successfully!")
 except Exception as e:
-    print(f"❌ Supabase connection failed: {str(e)}")
+    print(f"💥 Connection failed: {str(e)}")
     supabase = None
 
 @app.route('/')
 def health_check():
     return jsonify({
-        "status": "running",
-        "supabase_connected": supabase is not None
+        "status": "running", 
+        "database": "connected" if supabase else "disconnected"
     })
 
 @app.route('/api/crops', methods=['GET'])
 def get_crops():
     if not supabase:
-        return jsonify({"error": "Database connection failed"}), 500
+        return jsonify({"error": "Database unavailable"}), 503
         
     try:
-        search = request.args.get('search', '')
-        crop_type = request.args.get('type', '')
-        region = request.args.get('region', '')
+        filters = {
+            'search': request.args.get('search'),
+            'type': request.args.get('type'),
+            'region': request.args.get('region')
+        }
         
         query = supabase.table('crops').select('*')
         
-        if search:
-            query = query.ilike('name', f'%{search}%')
-        if crop_type:
-            query = query.eq('type', crop_type)
-        if region:
-            query = query.eq('region', region)
+        if filters['search']:
+            query = query.ilike('name', f"%{filters['search']}%")
+        if filters['type']:
+            query = query.eq('type', filters['type'])
+        if filters['region']:
+            query = query.eq('region', filters['region'])
+            
+        result = query.execute()
+        return jsonify(result.data if hasattr(result, 'data') else [])
         
-        response = query.execute()
-        if 'error' in response:
-            return jsonify({"error": response['error']}), 500
-        return jsonify(response['data'])
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
