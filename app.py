@@ -10,7 +10,7 @@ load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app)
 
 # Configure Supabase
 supabase = create_client(os.getenv('https://fhhpwfujypcpklpwvvhf.supabase.co'), os.getenv('yeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZoaHB3ZnVqeXBjcGtscHd2dmhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNDE1NDgsImV4cCI6MjA2OTkxNzU0OH0.z2j491yR9HunwNAGa_NngPiXAG18Cf1ZpaUAvdE5eF4'))
@@ -58,4 +58,5 @@ def recommendations():
         }), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    port = int(os.environ.get("PORT", 10000))  # <-- IMPORTANT CHANGE
+    app.run(host='0.0.0.0', port=port)        # <-- IMPORTANT CHANGE
